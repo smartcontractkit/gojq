@@ -1,6 +1,7 @@
 package gojq
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/big"
 )
@@ -20,6 +21,8 @@ func TypeOf(v interface{}) string {
 		return "number"
 	case string:
 		return "string"
+	case json.Number:
+		return "json.Number"
 	case []interface{}:
 		return "array"
 	case map[string]interface{}:

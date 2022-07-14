@@ -890,7 +890,7 @@ func funcIndex2(_, v, x interface{}) interface{} {
 		default:
 			return &expectedObjectError{v}
 		}
-	case int, float64, *big.Int:
+	case int, float64, *big.Int, json.Number:
 		i, _ := toInt(x)
 		switch v := v.(type) {
 		case nil:
@@ -1428,7 +1428,7 @@ func update(v interface{}, path []interface{}, n interface{}) (interface{}, erro
 		default:
 			return nil, &expectedObjectError{v}
 		}
-	case int, float64, *big.Int:
+	case int, float64, *big.Int, json.Number:
 		i, _ := toInt(p)
 		switch v := v.(type) {
 		case nil:
@@ -1940,6 +1940,13 @@ func toInt(x interface{}) (int, bool) {
 			return math.MaxInt, true
 		}
 		return math.MinInt, true
+	case json.Number:
+		xAsInt, err := x.Int64()
+		if err != nil {
+			return 0, false
+		} else {
+			return int(xAsInt), true
+		}
 	default:
 		return 0, false
 	}

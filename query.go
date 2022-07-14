@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+var (
+	useNumber = false
+)
+
 // Query represents the abstract syntax tree of a jq query.
 type Query struct {
 	Meta     *ConstObject
@@ -30,6 +34,7 @@ func (e *Query) RunWithContext(ctx context.Context, v interface{}) Iter {
 	if err != nil {
 		return NewIter(err)
 	}
+
 	return code.RunWithContext(ctx, v)
 }
 
@@ -103,6 +108,10 @@ func (e *Query) toIndices(xs []interface{}) []interface{} {
 		return nil
 	}
 	return e.Term.toIndices(xs)
+}
+
+func (e *Query) UseNumber() {
+	useNumber = true
 }
 
 // Import ...
