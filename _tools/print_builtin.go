@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/itchyny/gojq"
+	"github.com/smartcontractkit/gojq"
 )
 
 func main() {

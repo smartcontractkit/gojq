@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/itchyny/gojq"
+	"github.com/smartcontractkit/gojq"
 )
 
 // Implementation of range/2 using WithIterFunction option.

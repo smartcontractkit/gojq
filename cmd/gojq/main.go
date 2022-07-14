@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/itchyny/gojq/cli"
+	"github.com/smartcontractkit/gojq/cli"
 )
 
 func main() {

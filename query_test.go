@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/itchyny/gojq"
+	"github.com/smartcontractkit/gojq"
 )
 
 func ExampleQuery_Run() {

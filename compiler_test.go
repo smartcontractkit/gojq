@@ -11,7 +11,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/itchyny/gojq"
+	"github.com/smartcontractkit/gojq"
 )
 
 func ExampleCompile() {

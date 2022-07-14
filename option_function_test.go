@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/itchyny/gojq"
+	"github.com/smartcontractkit/gojq"
 )
 
 func toFloat(x interface{}) (float64, bool) {
