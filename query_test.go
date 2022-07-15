@@ -230,6 +230,37 @@ func TestQueryRun_NumericTypes(t *testing.T) {
 		}
 	}
 }
+func TestQueryRun_TrailingZeros(t *testing.T) {
+	query, err := gojq.Parse("recurse | scalars")
+	if err != nil {
+		t.Fatal(err)
+	}
+	query.UseNumber()
+	a := make([]json.Number, 3)
+	a[0] = json.Number("99.990")
+	a[1] = json.Number("100.0")
+	a[2] = json.Number("333.30")
+	input := make(map[string]interface{})
+	input["a0"] = a[0]
+	input["a1"] = a[1]
+	input["a2"] = a[2]
+
+	i := 0
+	iter := query.Run(input)
+	for {
+		v, ok := iter.Next()
+		if !ok {
+			break
+		}
+		if err, ok := v.(error); ok {
+			t.Fatal(err)
+		}
+		if a[i] != v {
+			t.Errorf("expected: %v, got: %v", a[i], v)
+		}
+		i++
+	}
+}
 
 func TestQueryRun_Input(t *testing.T) {
 	query, err := gojq.Parse("input")
