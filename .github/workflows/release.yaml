@@ -22,7 +22,7 @@ jobs:
 
     - name: Granting private modules access
       run: |
-        git config --global url."https://${{ secrets.GOJQCLI }}:x-oauth-basic@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit"
+        git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
 
     - name: Cross build
       run: make cross
