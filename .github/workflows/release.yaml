@@ -19,6 +19,10 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.x
+        
+    - name: Granting private modules access
+        run: |
+          git config --global url."https://${{ secrets.GOJQCLI }}:x-oauth-basic@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit"
 
     - name: Cross build
       run: make cross
