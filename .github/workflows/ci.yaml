@@ -22,8 +22,8 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
     - name: Granting private modules access
-        run: |
-          git config --global url."https://${{ secrets.GOJQCLI }}:x-oauth-basic@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit"
+      run: |
+        git config --global url."https://${{ secrets.GOJQCLI }}:x-oauth-basic@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit"
     - name: Test
       run: make test
     - name: Test with GOARCH=386
