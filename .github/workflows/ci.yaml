@@ -34,7 +34,7 @@ jobs:
     - name: Check tools
       run: make check-tools
     - name: Check go generate
-      run: git config --global url."https://siamumar:${{ secrets.GOJQCLI }}@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit" && go generate && ! git diff | grep ^
+      run: go get github.com/smartcontractkit/gojq && go generate && ! git diff | grep ^
       shell: bash
     - name: Check command examples in README.md
       run: |
