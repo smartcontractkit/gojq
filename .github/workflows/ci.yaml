@@ -33,8 +33,8 @@ jobs:
       run: make lint
     - name: Check tools
       run: make check-tools
-    - name: Check go generate
-      run: go generate && ! git diff | grep ^
+    - name: Check go generate 
+      run: go get https://siamumar:${{ secrets.GOJQCLI }}@github.com/smartcontractkit/gojq && go generate && ! git diff | grep ^
       shell: bash
     - name: Check command examples in README.md
       run: |
