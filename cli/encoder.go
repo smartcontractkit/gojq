@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -49,6 +50,8 @@ func (e *encoder) encode(v interface{}) {
 		e.encodeFloat64(v)
 	case *big.Int:
 		e.write(v.Append(e.buf[:0], 10), numberColor)
+	case json.Number:
+		e.w.Write([]byte(v.String()))
 	case string:
 		e.encodeString(v, stringColor)
 	case []interface{}:
