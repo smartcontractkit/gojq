@@ -34,7 +34,8 @@ jobs:
     - name: Check tools
       run: make check-tools
     - name: Check go generate
-      run: go get github.com/smartcontractkit/gojq && go generate && ! git diff | grep ^
+      run: go get github.com/smartcontractkit/gojq
+      run: go generate && ! git diff | grep ^
       shell: bash
     - name: Check command examples in README.md
       run: |
