@@ -765,7 +765,7 @@ func funcFromJSON(v interface{}) interface{} {
 	if _, err := dec.Token(); err != io.EOF {
 		return &funcTypeError{"fromjson", v}
 	}
-	return normalizeNumbers(w)
+	return normalizeNumbers(w, false) // todo-sh: not yet sure how to pass usingNumbers here
 }
 
 func funcFormat(v, x interface{}) interface{} {

@@ -5,21 +5,17 @@ import (
 	"strings"
 )
 
-var (
-	useNumber = false
-)
-
 // Query represents the abstract syntax tree of a jq query.
 type Query struct {
-	Meta      *ConstObject
-	Imports   []*Import
-	FuncDefs  []*FuncDef
-	Term      *Term
-	Left      *Query
-	Op        Operator
-	Right     *Query
-	Func      string
-	useNumber bool
+	Meta        *ConstObject
+	Imports     []*Import
+	FuncDefs    []*FuncDef
+	Term        *Term
+	Left        *Query
+	Op          Operator
+	Right       *Query
+	Func        string
+	usingNumber bool
 }
 
 // Run the query.
@@ -38,9 +34,7 @@ func (e *Query) RunWithContext(ctx context.Context, v interface{}) Iter {
 
 	// this is a strange way to do it
 	// but it has minimum edit of the original code
-	useNumber = e.useNumber
 	iter := code.RunWithContext(ctx, v)
-	useNumber = false
 
 	return iter
 }
@@ -118,7 +112,7 @@ func (e *Query) toIndices(xs []interface{}) []interface{} {
 }
 
 func (e *Query) UseNumber() {
-	e.useNumber = true
+	e.usingNumber = true
 }
 
 // Import ...

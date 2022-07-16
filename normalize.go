@@ -8,9 +8,6 @@ import (
 )
 
 func normalizeNumber(v json.Number) interface{} {
-	if useNumber {
-		return v
-	}
 	if i, err := v.Int64(); err == nil && math.MinInt <= i && i <= math.MaxInt {
 		return int(i)
 	}
@@ -28,9 +25,12 @@ func normalizeNumber(v json.Number) interface{} {
 	return math.Inf(1)
 }
 
-func normalizeNumbers(v interface{}) interface{} {
+func normalizeNumbers(v interface{}, usingNumber bool) interface{} {
 	switch v := v.(type) {
 	case json.Number:
+		if usingNumber {
+			return v
+		}
 		return normalizeNumber(v)
 	case *big.Int:
 		if v.IsInt64() {
@@ -73,12 +73,12 @@ func normalizeNumbers(v interface{}) interface{} {
 		return float64(v)
 	case []interface{}:
 		for i, x := range v {
-			v[i] = normalizeNumbers(x)
+			v[i] = normalizeNumbers(x, usingNumber)
 		}
 		return v
 	case map[string]interface{}:
 		for k, x := range v {
-			v[k] = normalizeNumbers(x)
+			v[k] = normalizeNumbers(x, usingNumber)
 		}
 		return v
 	default:

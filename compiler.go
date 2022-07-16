@@ -20,13 +20,15 @@ type compiler struct {
 	builtinScope  *scopeinfo
 	scopes        []*scopeinfo
 	scopecnt      int
+	usingNumber   bool
 }
 
 // Code is a compiled jq query.
 type Code struct {
-	variables []string
-	codes     []*code
-	codeinfos []codeinfo
+	variables   []string
+	codes       []*code
+	codeinfos   []codeinfo
+	usingNumber bool
 }
 
 // Run runs the code with the variable values (which should be in the
@@ -46,9 +48,9 @@ func (c *Code) RunWithContext(ctx context.Context, v interface{}, values ...inte
 		return NewIter(&expectedVariableError{c.variables[len(values)]})
 	}
 	for i, v := range values {
-		values[i] = normalizeNumbers(v)
+		values[i] = normalizeNumbers(v, c.usingNumber)
 	}
-	return newEnv(ctx).execute(c, normalizeNumbers(v), values...)
+	return newEnv(ctx).execute(c, normalizeNumbers(v, c.usingNumber), values...)
 }
 
 type scopeinfo struct {
@@ -74,6 +76,7 @@ type funcinfo struct {
 // Compile compiles a query.
 func Compile(q *Query, options ...CompilerOption) (*Code, error) {
 	c := &compiler{}
+	c.usingNumber = q.usingNumber
 	for _, opt := range options {
 		opt(c)
 	}
@@ -105,9 +108,10 @@ func Compile(q *Query, options ...CompilerOption) (*Code, error) {
 	c.optimizeTailRec()
 	c.optimizeCodeOps()
 	return &Code{
-		variables: c.variables,
-		codes:     c.codes,
-		codeinfos: c.codeinfos,
+		variables:   c.variables,
+		codes:       c.codes,
+		codeinfos:   c.codeinfos,
+		usingNumber: c.usingNumber,
 	}, nil
 }
 
@@ -159,7 +163,7 @@ func (c *compiler) compileImport(i *Import) error {
 		} else {
 			return fmt.Errorf("module not found: %q", path)
 		}
-		vals = normalizeNumbers(vals)
+		vals = normalizeNumbers(vals, c.usingNumber)
 		c.append(&code{op: oppush, v: vals})
 		c.append(&code{op: opstore, v: c.pushVariable(alias)})
 		c.append(&code{op: oppush, v: vals})
@@ -1034,7 +1038,7 @@ func (c *compiler) funcInput(interface{}, []interface{}) interface{} {
 	if !ok {
 		return errors.New("break")
 	}
-	return normalizeNumbers(v)
+	return normalizeNumbers(v, c.usingNumber)
 }
 
 func (c *compiler) funcModulemeta(v interface{}, _ []interface{}) interface{} {
