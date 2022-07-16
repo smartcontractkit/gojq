@@ -23,7 +23,7 @@ jobs:
         go-version: ${{ matrix.go }}
     - name: Granting private modules access
       run: |
-        git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+        git config --global url."https://siamumar:${{ secrets.GOJQCLI }}@github.com/smartcontractkit".insteadOf "https://github.com/smartcontractkit"
     - name: Test
       run: make test
     - name: Test with GOARCH=386
