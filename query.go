@@ -37,7 +37,7 @@ func (e *Query) RunWithContext(ctx context.Context, v interface{}) Iter {
 	}
 
 	// this is a strange way to do it
-	// but it has minimum eidt of the original code
+	// but it has minimum edit of the original code
 	useNumber = e.useNumber
 	iter := code.RunWithContext(ctx, v)
 	useNumber = false
