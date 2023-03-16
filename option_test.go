@@ -69,9 +69,9 @@ func TestWithModuleLoader_modulemeta(t *testing.T) {
 		if !ok {
 			break
 		}
-		if expected := map[string]interface{}{
-			"deps": []interface{}{
-				map[string]interface{}{
+		if expected := map[string]any{
+			"deps": []any{
+				map[string]any{
 					"relpath": "module2",
 					"as":      "foo",
 					"is_data": false,
@@ -87,10 +87,9 @@ func TestWithModuleLoader_modulemeta(t *testing.T) {
 
 type moduleLoaderJSON struct{}
 
-func (*moduleLoaderJSON) LoadJSON(name string) (interface{}, error) {
-	switch name {
-	case "module1":
-		return []interface{}{1.0, 42, json.Number("123")}, nil
+func (*moduleLoaderJSON) LoadJSON(name string) (any, error) {
+	if name == "module1" {
+		return []any{1.0, 42, json.Number("123")}, nil
 	}
 	return nil, fmt.Errorf("module not found: %q", name)
 }
@@ -116,7 +115,7 @@ func TestWithModuleLoader_JSON(t *testing.T) {
 		if !ok {
 			break
 		}
-		if expected := []interface{}{[]interface{}{1.0, 42, 123}, 5166}; !reflect.DeepEqual(got, expected) {
+		if expected := []any{[]any{1.0, 42, 123}, 5166}; !reflect.DeepEqual(got, expected) {
 			t.Errorf("expected: %v, got: %v", expected, got)
 		}
 	}
@@ -179,7 +178,7 @@ func TestWithEnvironLoader(t *testing.T) {
 		if !ok {
 			break
 		}
-		expected := map[string]interface{}{"foo": "42", "bar": "128", "qux": ""}
+		expected := map[string]any{"foo": "42", "bar": "128", "qux": ""}
 		if !reflect.DeepEqual(got, expected) {
 			t.Errorf("expected: %v, got: %v", expected, got)
 		}
@@ -201,7 +200,7 @@ func TestWithEnvironLoaderEmpty(t *testing.T) {
 		if !ok {
 			break
 		}
-		if expected := map[string]interface{}{}; !reflect.DeepEqual(got, expected) {
+		if expected := map[string]any{}; !reflect.DeepEqual(got, expected) {
 			t.Errorf("expected: %v, got: %v", expected, got)
 		}
 	}
@@ -288,13 +287,13 @@ func TestWithVariablesError2(t *testing.T) {
 
 func TestWithFunction(t *testing.T) {
 	options := []gojq.CompilerOption{
-		gojq.WithFunction("f", 0, 0, func(x interface{}, _ []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(x any, _ []any) any {
 			if x, ok := x.(int); ok {
 				return x * 2
 			}
 			return fmt.Errorf("f cannot be applied to: %v", x)
 		}),
-		gojq.WithFunction("g", 1, 1, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("g", 1, 1, func(x any, xs []any) any {
 			if x, ok := x.(int); ok {
 				if y, ok := xs[0].(int); ok {
 					return x + y
@@ -311,7 +310,7 @@ func TestWithFunction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	iter := code.Run([]interface{}{0, 1, 2, 3, 4})
+	iter := code.Run([]any{0, 1, 2, 3, 4})
 	n := 0
 	for {
 		v, ok := iter.Next()
@@ -355,13 +354,13 @@ func TestWithFunction(t *testing.T) {
 
 func TestWithFunctionDuplicateName(t *testing.T) {
 	options := []gojq.CompilerOption{
-		gojq.WithFunction("f", 0, 0, func(x interface{}, _ []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(x any, _ []any) any {
 			if x, ok := x.(int); ok {
 				return x * 2
 			}
 			return fmt.Errorf("f cannot be applied to: %v", x)
 		}),
-		gojq.WithFunction("f", 1, 1, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("f", 1, 1, func(x any, xs []any) any {
 			if x, ok := x.(int); ok {
 				if y, ok := xs[0].(int); ok {
 					return x + y
@@ -369,13 +368,13 @@ func TestWithFunctionDuplicateName(t *testing.T) {
 			}
 			return fmt.Errorf("f cannot be applied to: %v, %v", x, xs)
 		}),
-		gojq.WithFunction("f", 0, 0, func(x interface{}, _ []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(x any, _ []any) any {
 			if x, ok := x.(int); ok {
 				return x * 4
 			}
 			return fmt.Errorf("f cannot be applied to: %v", x)
 		}),
-		gojq.WithFunction("f", 2, 2, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("f", 2, 2, func(x any, xs []any) any {
 			if x, ok := x.(int); ok {
 				if y, ok := xs[0].(int); ok {
 					if z, ok := xs[1].(int); ok {
@@ -394,7 +393,7 @@ func TestWithFunctionDuplicateName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	iter := code.Run([]interface{}{0, 1, 2, 3, 4})
+	iter := code.Run([]any{0, 1, 2, 3, 4})
 	n := 0
 	for {
 		v, ok := iter.Next()
@@ -438,7 +437,7 @@ func TestWithFunctionDuplicateName(t *testing.T) {
 
 func TestWithFunctionMultipleArities(t *testing.T) {
 	options := []gojq.CompilerOption{
-		gojq.WithFunction("f", 0, 4, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 4, func(x any, xs []any) any {
 			if x, ok := x.(int); ok {
 				x *= 2
 				for _, y := range xs {
@@ -450,7 +449,7 @@ func TestWithFunctionMultipleArities(t *testing.T) {
 			}
 			return fmt.Errorf("f cannot be applied to: %v, %v", x, xs)
 		}),
-		gojq.WithFunction("f", 2, 3, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("f", 2, 3, func(x any, xs []any) any {
 			if x, ok := x.(int); ok {
 				for _, y := range xs {
 					if y, ok := y.(int); ok {
@@ -461,7 +460,7 @@ func TestWithFunctionMultipleArities(t *testing.T) {
 			}
 			return fmt.Errorf("f cannot be applied to: %v, %v", x, xs)
 		}),
-		gojq.WithFunction("g", 0, 30, func(x interface{}, xs []interface{}) interface{} {
+		gojq.WithFunction("g", 0, 30, func(x any, xs []any) any {
 			return nil
 		}),
 	}
@@ -473,7 +472,7 @@ func TestWithFunctionMultipleArities(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	iter := code.Run([]interface{}{0, 1, 2, 3, 4})
+	iter := code.Run([]any{0, 1, 2, 3, 4})
 	n := 0
 	for {
 		v, ok := iter.Next()
@@ -516,25 +515,25 @@ func TestWithFunctionMultipleArities(t *testing.T) {
 }
 
 type valueError struct {
-	v interface{}
+	v any
 }
 
 func (err *valueError) Error() string {
 	return "error: " + fmt.Sprint(err.v)
 }
 
-func (err *valueError) Value() interface{} {
+func (err *valueError) Value() any {
 	return err.v
 }
 
 func TestWithFunctionValueError(t *testing.T) {
-	expected := map[string]interface{}{"foo": 42}
+	expected := map[string]any{"foo": 42}
 	query, err := gojq.Parse("try f catch .")
 	if err != nil {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithFunction("f", 0, 0, func(x interface{}, _ []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(x any, _ []any) any {
 			return &valueError{expected}
 		}),
 	)
@@ -559,7 +558,7 @@ func TestWithFunctionCompileArgsError(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err = gojq.Compile(query,
-		gojq.WithFunction("f", 0, 1, func(interface{}, []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 1, func(any, []any) any {
 			return 0
 		}),
 	)
@@ -582,7 +581,7 @@ func TestWithFunctionArityError(t *testing.T) {
 				}
 			}()
 			t.Fatal(gojq.Compile(query,
-				gojq.WithFunction("f", tc.min, tc.max, func(interface{}, []interface{}) interface{} {
+				gojq.WithFunction("f", tc.min, tc.max, func(any, []any) any {
 					return 0
 				}),
 			))
@@ -596,10 +595,10 @@ func TestWithIterFunction(t *testing.T) {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithIterFunction("f", 0, 0, func(interface{}, []interface{}) gojq.Iter {
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
 			return gojq.NewIter(1, 2, 3)
 		}),
-		gojq.WithIterFunction("g", 2, 2, func(_ interface{}, xs []interface{}) gojq.Iter {
+		gojq.WithIterFunction("g", 2, 2, func(_ any, xs []any) gojq.Iter {
 			if x, ok := xs[0].(int); ok {
 				if y, ok := xs[1].(int); ok {
 					return &rangeIter{x, y}
@@ -607,7 +606,7 @@ func TestWithIterFunction(t *testing.T) {
 			}
 			return gojq.NewIter(fmt.Errorf("g cannot be applied to: %v", xs))
 		}),
-		gojq.WithIterFunction("h", 0, 0, func(interface{}, []interface{}) gojq.Iter {
+		gojq.WithIterFunction("h", 0, 0, func(any, []any) gojq.Iter {
 			return gojq.NewIter()
 		}),
 	)
@@ -637,7 +636,7 @@ func TestWithIterFunctionError(t *testing.T) {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithIterFunction("f", 0, 0, func(interface{}, []interface{}) gojq.Iter {
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
 			return gojq.NewIter(1, errors.New("error"), 3)
 		}),
 	)
@@ -672,13 +671,13 @@ func TestWithIterFunctionError(t *testing.T) {
 	}
 }
 
-func TestWithIterFunctionPath(t *testing.T) {
+func TestWithIterFunctionPathIndexing(t *testing.T) {
 	query, err := gojq.Parse(".[f] = 1")
 	if err != nil {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithIterFunction("f", 0, 0, func(interface{}, []interface{}) gojq.Iter {
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
 			return gojq.NewIter(0, 1, 2)
 		}),
 	)
@@ -691,20 +690,70 @@ func TestWithIterFunctionPath(t *testing.T) {
 		if !ok {
 			break
 		}
-		if expected := []interface{}{1, 1, 1}; !reflect.DeepEqual(v, expected) {
+		if expected := []any{1, 1, 1}; !reflect.DeepEqual(v, expected) {
 			t.Errorf("expected: %v, got: %v", expected, v)
 		}
 	}
 }
 
-func TestWithIterFunctionPathError(t *testing.T) {
+func TestWithIterFunctionPathInputValue(t *testing.T) {
 	query, err := gojq.Parse("{x: 0} | (f|.x) = 1")
 	if err != nil {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithIterFunction("f", 0, 0, func(interface{}, []interface{}) gojq.Iter {
-			return gojq.NewIter(map[string]interface{}{"x": 0})
+		gojq.WithIterFunction("f", 0, 0, func(v any, _ []any) gojq.Iter {
+			return gojq.NewIter(v, v, v)
+		}),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	iter := code.Run(nil)
+	for {
+		v, ok := iter.Next()
+		if !ok {
+			break
+		}
+		if expected := map[string]any{"x": 1}; !reflect.DeepEqual(v, expected) {
+			t.Errorf("expected: %v, got: %v", expected, v)
+		}
+	}
+}
+
+func TestWithIterFunctionPathEmpty(t *testing.T) {
+	query, err := gojq.Parse("{x: 0} | (f|.x) = 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	code, err := gojq.Compile(query,
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
+			return gojq.NewIter()
+		}),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	iter := code.Run(nil)
+	for {
+		v, ok := iter.Next()
+		if !ok {
+			break
+		}
+		if expected := map[string]any{"x": 0}; !reflect.DeepEqual(v, expected) {
+			t.Errorf("expected: %v, got: %v", expected, v)
+		}
+	}
+}
+
+func TestWithIterFunctionInvalidPathError(t *testing.T) {
+	query, err := gojq.Parse("{x: 0} | (f|.x) = 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	code, err := gojq.Compile(query,
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
+			return gojq.NewIter(map[string]any{"x": 1})
 		}),
 	)
 	if err != nil {
@@ -716,7 +765,34 @@ func TestWithIterFunctionPathError(t *testing.T) {
 		t.Fatal("should emit an error but got no output")
 	}
 	if err, ok := v.(error); ok {
-		if expected := "invalid path on iterating against: gojq.Iter"; err.Error() != expected {
+		if expected := `invalid path against: object ({"x":1})`; err.Error() != expected {
+			t.Errorf("expected: %v, got: %v", expected, err)
+		}
+	} else {
+		t.Errorf("should emit an error but got: %v", v)
+	}
+}
+
+func TestWithIterFunctionPathError(t *testing.T) {
+	query, err := gojq.Parse("{x: 0} | (f|.x) = 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	code, err := gojq.Compile(query,
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
+			return gojq.NewIter(errors.New("error"))
+		}),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	iter := code.Run(nil)
+	v, ok := iter.Next()
+	if !ok {
+		t.Fatal("should emit an error but got no output")
+	}
+	if err, ok := v.(error); ok {
+		if expected := "error"; err.Error() != expected {
 			t.Errorf("expected: %v, got: %v", expected, err)
 		}
 	} else {
@@ -736,10 +812,10 @@ func TestWithIterFunctionDefineError(t *testing.T) {
 		}
 	}()
 	t.Fatal(gojq.Compile(query,
-		gojq.WithFunction("f", 0, 0, func(interface{}, []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(any, []any) any {
 			return 0
 		}),
-		gojq.WithIterFunction("f", 0, 0, func(interface{}, []interface{}) gojq.Iter {
+		gojq.WithIterFunction("f", 0, 0, func(any, []any) gojq.Iter {
 			return gojq.NewIter()
 		}),
 	))
@@ -748,8 +824,7 @@ func TestWithIterFunctionDefineError(t *testing.T) {
 type moduleLoader2 struct{}
 
 func (*moduleLoader2) LoadModule(name string) (*gojq.Query, error) {
-	switch name {
-	case "module1":
+	if name == "module1" {
 		return gojq.Parse(`
 			def g: def h: f * 3; h * 4;
 		`)
@@ -763,7 +838,7 @@ func TestWithFunctionWithModuleLoader(t *testing.T) {
 		t.Fatal(err)
 	}
 	code, err := gojq.Compile(query,
-		gojq.WithFunction("f", 0, 0, func(x interface{}, _ []interface{}) interface{} {
+		gojq.WithFunction("f", 0, 0, func(x any, _ []any) any {
 			if x, ok := x.(int); ok {
 				return x * 2
 			}
@@ -774,7 +849,7 @@ func TestWithFunctionWithModuleLoader(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	iter := code.Run([]interface{}{0, 1, 2, 3, 4})
+	iter := code.Run([]any{0, 1, 2, 3, 4})
 	n := 0
 	for {
 		v, ok := iter.Next()
